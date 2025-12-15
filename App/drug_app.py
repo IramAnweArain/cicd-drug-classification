@@ -1,8 +1,16 @@
 import skops.io as sio
 import gradio as gr
+import os
 
-# Load the saved model
-pipe = sio.load("../Model/drug_pipeline.skops", trusted=True)
+# Define the path to the model
+model_path = "../Model/drug_pipeline.skops"
+
+# --- SECURITY FIX START ---
+# skops 0.10+ requires explicit trust. We inspect the file first.
+# This gets the list of types inside the model file so we can trust them.
+untrusted_types = sio.get_untrusted_types(file=model_path)
+pipe = sio.load(model_path, trusted=untrusted_types)
+# --- SECURITY FIX END ---
 
 def predict_drug(age, sex, bp, cholesterol, na_to_k):
     # Format input exactly as the model expects (DataFrame)
