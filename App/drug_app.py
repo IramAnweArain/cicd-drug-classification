@@ -2,15 +2,18 @@ import skops.io as sio
 import gradio as gr
 import os
 
-# Define the path to the model
-model_path = "../Model/drug_pipeline.skops"
+# --- PATH FIX: Make the path "Bulletproof" ---
+# 1. Get the folder where THIS script (drug_app.py) is located
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# --- SECURITY FIX START ---
-# skops 0.10+ requires explicit trust. We inspect the file first.
-# This gets the list of types inside the model file so we can trust them.
+# 2. Build the path to the model relative to this script
+#    This works no matter where the app is launched from.
+model_path = os.path.join(current_dir, "../Model/drug_pipeline.skops")
+# ---------------------------------------------
+
+# --- SECURITY FIX: Load safely ---
 untrusted_types = sio.get_untrusted_types(file=model_path)
 pipe = sio.load(model_path, trusted=untrusted_types)
-# --- SECURITY FIX END ---
 
 def predict_drug(age, sex, bp, cholesterol, na_to_k):
     # Format input exactly as the model expects (DataFrame)
