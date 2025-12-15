@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
@@ -9,6 +10,10 @@ from sklearn.metrics import accuracy_score, f1_score
 import matplotlib.pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay
 import skops.io as sio
+
+# Define directories
+os.makedirs("Results", exist_ok=True)
+os.makedirs("Model", exist_ok=True)
 
 # 1. Load Data
 df = pd.read_csv("drug200.csv")
