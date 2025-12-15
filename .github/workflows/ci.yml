@@ -1,0 +1,36 @@
+name: Continuous Integration
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - uses: iterative/setup-cml@v1
+
+      - name: Install Packages
+        run: make install
+
+      - name: Train Model
+        run: make train
+
+      - name: Write CML Report
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Post reports as comments in GitHub PRs
+          echo "## Model Metrics" > report.md
+          cat Results/metrics.txt >> report.md
+
+          echo "## Confusion Matrix" >> report.md
+          echo "![](./Results/model_results.png)" >> report.md
+
+          cml comment create report.md

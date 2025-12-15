@@ -1,0 +1,26 @@
+name: Continuous Deployment
+on:
+  workflow_run:
+    workflows: ["Continuous Integration"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          lfs: true
+      
+      - name: Push to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git config --global user.email "bot@example.com"
+          git config --global user.name "CI/CD Bot"
+          # IMPORTANT: The next line is the tricky part
+          git remote add space https://Iram-Anwer25:$HF_TOKEN@huggingface.co/spaces/Iram-Anwer25/Drug-Classification
+          git push --force space main
